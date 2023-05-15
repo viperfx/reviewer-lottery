@@ -8,6 +8,7 @@ export interface Pull {
   }
   number: number
   draft: boolean
+  issue_url: string
 }
 
 interface SelectReviewer {
@@ -25,6 +26,7 @@ class Lottery {
   config: Config
   env: Env
   pr: Pull | undefined
+  issue_number: string | undefined
 
   constructor({
     octokit,
@@ -72,10 +74,10 @@ class Lottery {
     const ownerAndRepo = this.getOwnerAndRepo()
     const pr = this.getPRNumber()
 
-    if (assignee === 'yes') {
+    if (assignee === 'yes' && this.issue_number) {
       return this.octokit.issues.addAssignees({
         ...ownerAndRepo,
-        issue_number: pr, // eslint-disable-line @typescript-eslint/camelcase
+        issue_number: Number.parseInt(this.issue_number), // eslint-disable-line @typescript-eslint/camelcase
         assignees: reviewers.filter((r: string | undefined) => !!r)
       })
     }
@@ -173,6 +175,8 @@ class Lottery {
       if (!this.pr) {
         throw new Error(`PR matching ref not found: ${this.env.ref}`)
       }
+
+      this.issue_number = this.pr.issue_url.split('/').pop()
 
       return this.pr
     } catch (error) {

@@ -4,6 +4,7 @@ import {runLottery, Pull} from '../src/lottery'
 
 const octokit = new Octokit()
 const prNumber = 123
+const issueNumber = 456
 const ref = 'refs/pull/branch-name'
 const basePull = {number: prNumber, head: {ref}}
 
@@ -16,7 +17,8 @@ test('selects reviewers from a pool of users, ignoring author', async () => {
   const pull = {
     ...basePull,
     user: {login: 'author'},
-    draft: false
+    draft: false,
+    issue_url: 'https://api.github.com/repos/octocat/Hello-World/issues/1347'
   }
 
   const getPullMock = mockGetPull(pull)
@@ -61,7 +63,8 @@ test("doesn't assign reviewers if the PR is in draft state", async () => {
   const pull = {
     ...basePull,
     user: {login: 'author'},
-    draft: true
+    draft: true,
+    issue_url: 'https://api.github.com/repos/octocat/Hello-World/issues/1347'
   }
 
   const getPullMock = mockGetPull(pull)
@@ -89,7 +92,8 @@ test("doesn't send invalid reviewers if there is no elegible reviewers from one 
   const pull = {
     ...basePull,
     user: {login: 'author'},
-    draft: false
+    draft: false,
+    issue_url: 'https://api.github.com/repos/octocat/Hello-World/issues/1347'
   }
 
   const getPullMock = mockGetPull(pull)
@@ -134,7 +138,8 @@ test('selects internal reviewers if configured and author belongs to group', asy
   const pull = {
     ...basePull,
     user: {login: 'author'},
-    draft: false
+    draft: false,
+    issue_url: 'https://api.github.com/repos/octocat/Hello-World/issues/1347'
   }
 
   const getPullMock = mockGetPull(pull)
@@ -182,7 +187,8 @@ test("doesn't assign internal reviewers if the author doesn't belong to group", 
   const pull = {
     ...basePull,
     user: {login: 'author'},
-    draft: false
+    draft: false,
+    issue_url: 'https://api.github.com/repos/octocat/Hello-World/issues/1347'
   }
 
   const getPullMock = mockGetPull(pull)
@@ -230,7 +236,8 @@ test("doesn't assign reviewers if the author doesn't belong to group", async () 
   const pull = {
     ...basePull,
     user: {login: 'author'},
-    draft: false
+    draft: false,
+    issue_url: 'https://api.github.com/repos/octocat/Hello-World/issues/1347'
   }
 
   const getPullMock = mockGetPull(pull)
@@ -261,7 +268,8 @@ test('selects assigner from a pool of users, ignoring author', async () => {
   const pull = {
     ...basePull,
     user: {login: 'author'},
-    draft: false
+    draft: false,
+    issue_url: 'https://api.github.com/repos/octocat/Hello-World/issues/456'
   }
 
   const getPullMock = mockGetPull(pull)
@@ -270,7 +278,7 @@ test('selects assigner from a pool of users, ignoring author', async () => {
 
   const postAssigneesMock = nock('https://api.github.com')
     .post(
-      `/repos/uesteibar/repository/issues/${prNumber}/assignees`,
+      `/repos/uesteibar/repository/issues/${issueNumber}/assignees`,
       (body): boolean => {
         body.assignees.forEach((reviewer: string) => {
           expect(candidates).toContain(reviewer)
