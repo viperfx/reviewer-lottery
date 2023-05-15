@@ -269,7 +269,7 @@ test('selects assigner from a pool of users, ignoring author', async () => {
     ...basePull,
     user: {login: 'author'},
     draft: false,
-    issue_url: 'https://api.github.com/repos/octocat/Hello-World/issues/456'
+    issue_url: 'https://api.github.com/repos/uesteibar/repository/issues/456'
   }
 
   const getPullMock = mockGetPull(pull)

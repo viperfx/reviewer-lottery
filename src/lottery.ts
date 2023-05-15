@@ -75,11 +75,13 @@ class Lottery {
     const pr = this.getPRNumber()
 
     if (assignee === 'yes' && this.issue_number) {
-      return this.octokit.issues.addAssignees({
+      const result = await this.octokit.issues.addAssignees({
         ...ownerAndRepo,
         issue_number: Number.parseInt(this.issue_number), // eslint-disable-line @typescript-eslint/camelcase
         assignees: reviewers.filter((r: string | undefined) => !!r)
       })
+      core.debug(JSON.stringify(result))
+      return result
     }
 
     return this.octokit.pulls.requestReviewers({
