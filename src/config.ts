@@ -4,7 +4,7 @@ import fs from 'fs'
 
 interface Group {
   name: string
-  assignee?: boolean
+  assignee?: string
   reviewers?: number
   internal_reviewers?: number
   usernames: string[]

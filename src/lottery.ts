@@ -11,7 +11,7 @@ export interface Pull {
 }
 
 interface SelectReviewer {
-  assignee: boolean
+  assignee: string
   reviewers: string[]
 }
 
@@ -68,11 +68,11 @@ class Lottery {
     }
   }
 
-  async setReviewers(reviewers: string[], assignee: boolean): Promise<object> {
+  async setReviewers(reviewers: string[], assignee: string): Promise<object> {
     const ownerAndRepo = this.getOwnerAndRepo()
     const pr = this.getPRNumber()
 
-    if (assignee) {
+    if (assignee === 'yes') {
       return this.octokit.issues.addAssignees({
         ...ownerAndRepo,
         issue_number: pr, // eslint-disable-line @typescript-eslint/camelcase
@@ -89,7 +89,7 @@ class Lottery {
 
   async selectReviewers(): Promise<SelectReviewer> {
     let selected: string[] = []
-    let assignee: boolean = false
+    let assignee: string = 'no'
     const author = await this.getPRAuthor()
 
     try {
@@ -109,7 +109,7 @@ class Lottery {
             this.pickRandom(usernames, reviewersToRequest, author)
           )
         }
-        assignee = assignee_in_grpup || false
+        assignee = assignee_in_grpup || 'no'
       }
     } catch (error) {
       core.error(error)

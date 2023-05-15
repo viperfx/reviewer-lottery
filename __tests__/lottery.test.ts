@@ -286,7 +286,7 @@ test('selects assigner from a pool of users, ignoring author', async () => {
       {
         name: 'Test',
         reviewers: 2,
-        assignee: true,
+        assignee: 'yes',
         usernames: candidates
       }
     ]
