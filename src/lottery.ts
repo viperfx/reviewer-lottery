@@ -81,6 +81,7 @@ class Lottery {
         assignees: reviewers.filter((r: string | undefined) => !!r)
       })
       core.info(JSON.stringify(result))
+      core.debug(JSON.stringify(result))
       console.log(JSON.stringify(result))
       return result
     }
