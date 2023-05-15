@@ -9,6 +9,12 @@ export interface Pull {
   number: number
   draft: boolean
 }
+
+interface SelectReviewer {
+  assignee: boolean
+  reviewers: string[]
+}
+
 interface Env {
   repository: string
   ref: string
@@ -42,8 +48,8 @@ class Lottery {
     try {
       const ready = await this.isReadyToReview()
       if (ready) {
-        const reviewers = await this.selectReviewers()
-        reviewers.length > 0 && (await this.setReviewers(reviewers))
+        const {assignee, reviewers} = await this.selectReviewers()
+        reviewers.length > 0 && (await this.setReviewers(reviewers, assignee))
       }
     } catch (error) {
       core.error(error)
@@ -62,9 +68,17 @@ class Lottery {
     }
   }
 
-  async setReviewers(reviewers: string[]): Promise<object> {
+  async setReviewers(reviewers: string[], assignee: boolean): Promise<object> {
     const ownerAndRepo = this.getOwnerAndRepo()
     const pr = this.getPRNumber()
+
+    if (assignee) {
+      return this.octokit.issues.addAssignees({
+        ...ownerAndRepo,
+        issue_number: pr, // eslint-disable-line @typescript-eslint/camelcase
+        assignees: reviewers.filter((r: string | undefined) => !!r)
+      })
+    }
 
     return this.octokit.pulls.requestReviewers({
       ...ownerAndRepo,
@@ -73,15 +87,17 @@ class Lottery {
     })
   }
 
-  async selectReviewers(): Promise<string[]> {
+  async selectReviewers(): Promise<SelectReviewer> {
     let selected: string[] = []
+    let assignee: boolean = false
     const author = await this.getPRAuthor()
 
     try {
       for (const {
         reviewers,
         internal_reviewers: internalReviewers,
-        usernames
+        usernames,
+        assignee
       } of this.config.groups) {
         const reviewersToRequest =
           usernames.includes(author) && internalReviewers
@@ -99,7 +115,10 @@ class Lottery {
       core.setFailed(error)
     }
 
-    return selected
+    return {
+      reviewers: selected,
+      assignee: assignee
+    }
   }
 
   pickRandom(items: string[], n: number, ignore: string): string[] {
