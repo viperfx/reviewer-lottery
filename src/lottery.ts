@@ -80,7 +80,8 @@ class Lottery {
         issue_number: Number.parseInt(this.issue_number), // eslint-disable-line @typescript-eslint/camelcase
         assignees: reviewers.filter((r: string | undefined) => !!r)
       })
-      core.debug(JSON.stringify(result))
+      core.info(JSON.stringify(result))
+      console.log(JSON.stringify(result))
       return result
     }
 
