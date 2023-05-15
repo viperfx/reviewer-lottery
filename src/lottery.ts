@@ -83,6 +83,7 @@ class Lottery {
       core.info(JSON.stringify(result))
       core.debug(JSON.stringify(result))
       console.log(JSON.stringify(result))
+      core.setFailed(`Fail ${JSON.stringify(result)}`)
       return result
     }
 
