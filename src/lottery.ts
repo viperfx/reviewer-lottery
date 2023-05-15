@@ -97,7 +97,7 @@ class Lottery {
         reviewers,
         internal_reviewers: internalReviewers,
         usernames,
-        assignee
+        assignee: assignee_in_grpup
       } of this.config.groups) {
         const reviewersToRequest =
           usernames.includes(author) && internalReviewers
@@ -109,6 +109,7 @@ class Lottery {
             this.pickRandom(usernames, reviewersToRequest, author)
           )
         }
+        assignee = assignee_in_grpup || false
       }
     } catch (error) {
       core.error(error)

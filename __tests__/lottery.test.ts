@@ -256,3 +256,49 @@ test("doesn't assign reviewers if the author doesn't belong to group", async () 
 
   nock.cleanAll()
 })
+
+test('selects assigner from a pool of users, ignoring author', async () => {
+  const pull = {
+    ...basePull,
+    user: {login: 'author'},
+    draft: false
+  }
+
+  const getPullMock = mockGetPull(pull)
+
+  const candidates = ['A', 'B', 'C', 'D', 'author']
+
+  const postAssigneesMock = nock('https://api.github.com')
+    .post(
+      `/repos/uesteibar/repository/issues/${prNumber}/assignees`,
+      (body): boolean => {
+        body.assignees.forEach((reviewer: string) => {
+          expect(candidates).toContain(reviewer)
+          expect(reviewer).not.toEqual('author')
+        })
+        return true
+      }
+    )
+    .reply(200, pull)
+
+  const config = {
+    groups: [
+      {
+        name: 'Test',
+        reviewers: 2,
+        assignee: true,
+        usernames: candidates
+      }
+    ]
+  }
+
+  await runLottery(octokit, config, {
+    repository: 'uesteibar/repository',
+    ref
+  })
+
+  getPullMock.done()
+  postAssigneesMock.done()
+
+  nock.cleanAll()
+})
