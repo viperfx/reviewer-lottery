@@ -74,6 +74,9 @@ class Lottery {
     const ownerAndRepo = this.getOwnerAndRepo()
     const pr = this.getPRNumber()
 
+    core.debug(`assignee = ${assignee}`)
+    core.debug(`this.issue_number = ${this.issue_number}`)
+    core.debug(`this.issue_number = ${JSON.stringify(reviewers)}`)
     if (assignee === 'yes' && this.issue_number) {
       const result = await this.octokit.issues.addAssignees({
         ...ownerAndRepo,
